@@ -9,6 +9,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 
+
 class Food:
     """Food class, to model the food to grow the snake."""
 
@@ -20,11 +21,12 @@ class Food:
             self.x * self.size, self.y * self.size, self.size, self.size
         )
 
-    def draw(self, win):
+    def draw(self, win, img):
         """Draw the food on the window."""
         self.rect.x = self.x * self.size
         self.rect.y = self.y * self.size
-        pygame.draw.rect(win, GREEN, self.rect)
+        # pygame.draw.rect(win, GREEN, self.rect)
+        win.blit(img, self.rect)
 
     def eaten(self, x, y):
         """Update the location of the food."""

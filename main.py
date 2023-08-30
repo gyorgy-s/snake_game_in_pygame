@@ -39,12 +39,24 @@ LEFT = (-1, 0)
 DOWN = (0, 1)
 RIGHT = (1, 0)
 
+apple = pygame.transform.scale(pygame.image.load("assets/apple.png").convert_alpha(), (20, 20))
+
+snake_body ={
+    "head": pygame.transform.scale(pygame.image.load("assets/head.png").convert_alpha(), (20, 20)),
+    "body-h": pygame.transform.scale(pygame.image.load("assets/body.png").convert_alpha(), (20, 20)),
+    "body-v": pygame.transform.rotozoom(pygame.image.load("assets/body.png").convert_alpha(), 90, 0.5),
+    "tail": pygame.transform.scale(pygame.image.load("assets/tail.png").convert_alpha(), (20, 20)),
+    "bend-0": pygame.transform.scale(pygame.image.load("assets/bend.png").convert_alpha(), (20, 20)),
+    "bend-90": pygame.transform.rotozoom(pygame.image.load("assets/bend.png").convert_alpha(), 90, 0.5),
+    "bend-180": pygame.transform.rotozoom(pygame.image.load("assets/bend.png").convert_alpha(), 180, 0.5),
+    "bend-270": pygame.transform.rotozoom(pygame.image.load("assets/bend.png").convert_alpha(), 270, 0.5),
+}
 
 def draw(win, snake, food, score):
     """Draw the main window."""
     win.fill(BLACK)
-    snake.draw(win)
-    food.draw(win)
+    snake.draw(win, snake_body)
+    food.draw(win, apple)
     score.draw_score(win, 24, 10, 10)
     pygame.display.update()
 
@@ -97,7 +109,7 @@ def main():
                         // SEGMENT_SIZE,
                     )
                     snake.grow(SEGMENT_SIZE)
-                    score.score = +1
+                    score.score += 1
                 if (not snake.collision(window_border)) or snake.self_collision():
                     session_end = pygame.time.get_ticks()
                     playing = False
