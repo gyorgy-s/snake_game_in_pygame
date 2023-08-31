@@ -8,7 +8,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-DIRECTIONS = {"w": (0, -1), "a": (-1, 0), "s": (0, 1), "d": (1, 0)}
+DIRECTIONS = {"w": [0, -1], "a": [-1, 0], "s": [0, 1], "d": [1, 0]}
 
 TEST = [[0, -1, 0, 1], [-1, 0, 1, 0]]
 TEST2 = {
@@ -30,10 +30,10 @@ BENDS = {
     "w-d": 180,
     "a-w": 270,
     "a-s": 180,
-    "s-a": 90,
+    "s-a": 0,
     "s-d": 270,
-    "d-w": 90,
-    "d-s": 180,
+    "d-w": 0,
+    "d-s": 90,
 }
 
 
@@ -53,7 +53,6 @@ class Segment:
         """Update the Rect location and draw to the screen."""
         self.rect.x = self.x * self.size
         self.rect.y = self.y * self.size
-        # pygame.draw.rect(win, WHITE, self.rect)
         img = pygame.transform.rotate(img, rotation)
         win.blit(img, self.rect)
 
@@ -78,7 +77,7 @@ class Snake:
 
     def draw(self, win, img):
         """Draw each part of the snake to the screen."""
-        for i in range(len(self.segments) - 1, -1, -1):
+        for i in range(len(self.segments)):
             if i == 0:
                 self.segments[0].draw(
                     win,
@@ -96,27 +95,35 @@ class Snake:
                     ],
                 )
             else:
-                if self.segments[i + 1].x - self.segments[i - 1].x == 0:
-                    self.segments[i].draw(win, img["body-v"])
-                elif self.segments[i + 1].y - self.segments[i - 1].y == 0:
-                    self.segments[i].draw(win, img["body-h"])
-                    # this_temp_x = str(self.segments[i].direction[0])
-                    # this_temp_y = str(self.segments[i].direction[1])
-                    # this_lookup = this_temp_x + this_temp_y
-                    # prev_temp_x = str(self.segments[i - 1].direction[0])
-                    # prev_temp_y = str(self.segments[i - 1].direction[1])
-                    # prev_lookup = prev_temp_x + prev_temp_y
-                    # rotation = BENDS[TEST2[this_lookup] + "-" + TEST2[prev_lookup]]
-                    # self.segments[i].draw(win, img["bend"], rotation)
-                    # is_bend = [self.segments[i].direction[0] + self.segments[i-1].direction[0], self.segments[i].direction[1] + self.segments[i-1].direction[1]]
-
-                    # if self.segments[i].direction
-                    pass
+                if (
+                    self.segments[i + 1].x - self.segments[i - 1].x == 0
+                    or self.segments[i + 1].y - self.segments[i - 1].y == 0
+                ):
+                    self.segments[i].draw(
+                        win,
+                        img["body-h"],
+                        ROTATION[self.segments[i].direction[0]][
+                            self.segments[i].direction[1]
+                        ],
+                    )
+                else:
+                    next_temp_x = str(self.segments[i].direction[0])
+                    next_temp_y = str(self.segments[i].direction[1])
+                    next_lookup = next_temp_x + next_temp_y
+                    prev_temp_x = str(self.segments[i - 1].direction[0])
+                    prev_temp_y = str(self.segments[i - 1].direction[1])
+                    prev_lookup = prev_temp_x + prev_temp_y
+                    rotation = BENDS[TEST2[next_lookup] + "-" + TEST2[prev_lookup]]
+                    self.segments[i].draw(win, img["bend-0"], rotation)
 
     def move(self):
         """Move the head of the snake and update
         the location and direction for the rest of the body."""
-        for i in range(len(self.segments) - 1, 0, -1):
+        self.segments[-1].x = self.segments[-2].x
+        self.segments[-1].y = self.segments[-2].y
+        self.segments[-1].direction = self.segments[-3].direction
+
+        for i in range(len(self.segments) - 2, 0, -1):
             self.segments[i].x = self.segments[i - 1].x
             self.segments[i].y = self.segments[i - 1].y
             self.segments[i].direction = self.segments[i - 1].direction
@@ -145,16 +152,13 @@ class Snake:
 
     def grow(self, size):
         """Increase the size of the body by one."""
-        self.segments.append(
+        self.segments.insert(
+            1,
             Segment(
-                self.segments[len(self.segments) - 1].x,
-                self.segments[len(self.segments) - 1].y,
+                self.segments[1].x,
+                self.segments[1].y,
                 size,
-                self.segments[len(self.segments) - 1].direction
-                # self.x - self.direction[0],
-                # self.y - self.direction[1],
-                # size,
-                # self.direction,
+                self.segments[1].direction,
             ),
         )
 

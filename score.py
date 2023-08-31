@@ -14,7 +14,6 @@ class Score:
     def __init__(self) -> None:
         self.score = 0
         self.time = 0
-        # self.score_surface = pygame.Surface()
         self.font_type = pygame.font.get_default_font()
         self.font = None
 
